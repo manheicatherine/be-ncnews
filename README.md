@@ -1,9 +1,5 @@
 # Northcoders News API
 
-### TICKET 2 : Update your readme to explain what files a developer must add in order to successfully connect to the two databases locally.
-ANSWER: A developer need to add the .env file of development and test databases. In the connection.js file, is connecting 2 databases.
-
-
 ## Kanban
 ### Link to your Trello Board here: https://trello.com/b/7yiHe1nI
 
