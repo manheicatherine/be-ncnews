@@ -1,5 +1,9 @@
 # Northcoders News API
 
+
+1. .env.development: PGDATABASE=nc_news
+2. .env.test: PGDATABASE=nc_news_test
+
 ## Kanban
 ### Link to your Trello Board here: https://trello.com/b/7yiHe1nI
 
