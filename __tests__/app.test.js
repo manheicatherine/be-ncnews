@@ -46,41 +46,37 @@ describe("API Testing", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          const objOfArr = body.articles;
-          expect(objOfArr.length).toBe(1);
-
-          objOfArr.forEach((obj) => {
-            expect(obj).toEqual(
-              expect.objectContaining({
-                article_id: expect.any(Number),
-                title: expect.any(String),
-                topic: expect.any(String),
-                author: expect.any(String),
-                body: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                article_img_url: expect.any(String),
-              })
-            );
-          });
+          const article = body.article;
+          expect(article.length).toBe(1);
+          expect(article).toEqual([{
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          }]);
         });
     });
-    test("Error handling 1: passing a valid but not existing id", () => {
-      return request(app)
-        .get("/api/articles/100")
-        .expect(404)
-        .then(({body}) => {
-          expect(body.msg).toBe("404 Not Found");
-        });
-    });
+  });
+  test("Error handling 1: passing a valid but not existing id", () => {
+    return request(app)
+      .get("/api/articles/100")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404 Not Found");
+      });
+  });
 
-    test("Error handling 2: passing a invalid id", () => {
-        return request(app)
-          .get("/api/articles/hellokitty")
-          .expect(400)
-          .then(({body}) => {
-            expect(body.msg).toBe("Bad request");
-          });
+  test("Error handling 2: passing a invalid id", () => {
+    return request(app)
+      .get("/api/articles/hellokitty")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
       });
   });
 });
