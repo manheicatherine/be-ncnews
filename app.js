@@ -1,13 +1,15 @@
 const express = require("express");
 const app = express();
 const { getTopics } = require("./controllers/topics.controllers");
-const { getArticles } = require("./controllers/articles.controllers");
+const { getArticles, getArticlesById } = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
+app.get("/api/articles/:article_id", getArticlesById);
+
+
 
 app.use((err, request, response, next) => {
-    console.log(err)
   if (err.status) {
     response.status(err.status).send({ msg: err.msg });
   } else {
