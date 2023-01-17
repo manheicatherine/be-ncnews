@@ -85,4 +85,52 @@ describe("API Testing", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
+
+  describe.only("Ticket 6: GET /api/articles/:article_id/comments", () => {
+    test("returns an array of article 1 the most recent comments in descending order", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles.length).toBe(11);
+
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
+          });
+
+          expect(articles[0].created_at).toBe("2020-11-03T21:00:00.000Z");
+          expect(articles[articles.length - 1].created_at).toBe(
+            "2020-01-01T03:08:00.000Z"
+          );
+        });
+    });
+    test("Error handling 1: passing a valid but not existing id", () => {
+      return request(app)
+        .get("/api/articles/1001/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
+        });
+    });
+  
+    test("Error handling 2: passing a invalid id", () => {
+      return request(app)
+        .get("/api/articles/whereismyholiday")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
 });
