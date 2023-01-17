@@ -15,7 +15,7 @@ exports.fetchArticles = () => {
       const checkVal = Object.values(addCommentCount[0]);
       
       if (checkVal.includes(null)) {
-        return Promise.reject({ status: 204, msg: `No Content` });
+        return Promise.reject({ status: 404, msg: `Path not found!` });
       } else {
         return addCommentCount;
       }

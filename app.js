@@ -7,6 +7,7 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.use((err, request, response, next) => {
+    console.log(err)
   if (err.status) {
     response.status(err.status).send({ msg: err.msg });
   } else {
