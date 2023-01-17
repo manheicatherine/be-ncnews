@@ -36,6 +36,10 @@ describe("API Testing", () => {
         .then(({ body }) => {
           const objOfArr = body.articles;
           expect(objOfArr.length).toBe(12);
+          expect(objOfArr[0].created_at).toBe("2020-11-03T09:12:00.000Z");
+          expect(objOfArr[objOfArr.length - 1].created_at).toBe(
+            "2020-01-07T14:08:00.000Z"
+          );
         });
     });
   });
@@ -48,17 +52,19 @@ describe("API Testing", () => {
         .then(({ body }) => {
           const article = body.article;
           expect(article.length).toBe(1);
-          expect(article).toEqual([{
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 100,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-          }]);
+          expect(article).toEqual([
+            {
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 100,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            },
+          ]);
         });
     });
   });
