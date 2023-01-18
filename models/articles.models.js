@@ -35,8 +35,9 @@ exports.fetchCommentsByArticleId = (id) => {
       `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, [id]
     )
     .then(({ rows }) => {
-    
-      if (rows.length === 0) {
+        if (rows.length === 0){
+
+        }else if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "404 Not Found" });
       } else {
         return rows;

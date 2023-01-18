@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const { app } = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
+require('jest-sorted');
 
 beforeEach(() => seed(testData));
 afterAll(() => {
@@ -86,17 +87,17 @@ describe("API Testing", () => {
       });
   });
 
-  describe.only("Ticket 6: GET /api/articles/:article_id/comments", () => {
+  describe("Ticket 6: GET /api/articles/:article_id/comments", () => {
     test("returns an array of article 1 the most recent comments in descending order", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          const { articles } = body;
+          const { comments } = body;
 
-          expect(articles.length).toBe(11);
+          expect(comments.length).toBe(11);
 
-          body.articles.forEach((article) => {
+          body.comments.forEach((article) => {
             expect(article).toEqual(
               expect.objectContaining({
                 comment_id: expect.any(Number),
@@ -109,13 +110,24 @@ describe("API Testing", () => {
             );
           });
 
-          expect(articles[0].created_at).toBe("2020-11-03T21:00:00.000Z");
-          expect(articles[articles.length - 1].created_at).toBe(
+
+          expect(comments[0].created_at).toBe("2020-11-03T21:00:00.000Z");
+          expect(comments[comments.length - 1].created_at).toBe(
             "2020-01-01T03:08:00.000Z"
           );
         });
     });
-    test("Error handling 1: passing a valid but not existing id", () => {
+
+    test("returns empty array when a valid number is passing with no comments", () => {
+        return request(app)
+          .get("/api/articles/2/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({});
+          });
+      });
+
+    test.only("Error handling 1: passing a valid but not existing id", () => {
       return request(app)
         .get("/api/articles/1001/comments")
         .expect(404)
@@ -126,7 +138,7 @@ describe("API Testing", () => {
   
     test("Error handling 2: passing a invalid id", () => {
       return request(app)
-        .get("/api/articles/whereismyholiday")
+        .get("/api/articles/whereismyholiday/comments")
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Bad request");
