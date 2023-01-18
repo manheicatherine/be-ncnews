@@ -3,7 +3,7 @@ const testData = require("../db/data/test-data");
 const { app } = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
-require('jest-sorted');
+require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => {
@@ -68,23 +68,23 @@ describe("API Testing", () => {
           ]);
         });
     });
-  });
-  test("Error handling 1: passing a valid but not existing id", () => {
-    return request(app)
-      .get("/api/articles/100")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("404 Not Found");
-      });
-  });
+    test("Error handling 1: passing a valid but not existing id", () => {
+      return request(app)
+        .get("/api/articles/100")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
+        });
+    });
 
-  test("Error handling 2: passing a invalid id", () => {
-    return request(app)
-      .get("/api/articles/hellokitty")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad request");
-      });
+    test("Error handling 2: passing a invalid id", () => {
+      return request(app)
+        .get("/api/articles/hellokitty")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
   });
 
   describe("Ticket 6: GET /api/articles/:article_id/comments", () => {
@@ -110,7 +110,6 @@ describe("API Testing", () => {
             );
           });
 
-
           expect(comments[0].created_at).toBe("2020-11-03T21:00:00.000Z");
           expect(comments[comments.length - 1].created_at).toBe(
             "2020-01-01T03:08:00.000Z"
@@ -119,15 +118,15 @@ describe("API Testing", () => {
     });
 
     test("returns empty array when a valid number is passing with no comments", () => {
-        return request(app)
-          .get("/api/articles/2/comments")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body).toEqual({});
-          });
-      });
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+        });
+    });
 
-    test.only("Error handling 1: passing a valid but not existing id", () => {
+    test("Error handling 1: passing a valid but not existing id", () => {
       return request(app)
         .get("/api/articles/1001/comments")
         .expect(404)
@@ -135,7 +134,7 @@ describe("API Testing", () => {
           expect(body.msg).toBe("404 Not Found");
         });
     });
-  
+
     test("Error handling 2: passing a invalid id", () => {
       return request(app)
         .get("/api/articles/whereismyholiday/comments")
@@ -145,4 +144,40 @@ describe("API Testing", () => {
         });
     });
   });
+
+  describe("Ticket 7: POST /api/articles/:article_id/comments", () => {
+      test("return the status of 201", () => {
+        const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
+        return request(app)
+        .post('/api/articles/5/comments')
+        .send(reqBody)
+        .expect(201);
+    });
+    test("update an array of article 5 when passing new object", () => {
+      const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
+      return request(app)
+      .post('/api/articles/5/comments')
+      .send(reqBody)
+      .expect(201)
+      .then(({body})=>{
+        console.log(body);
+        expect(body.comment.length).toBe(1);
+        body.comment.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String)
+            })
+          );
+        });
+    });
+  });
+  });
+
+
+
 });
