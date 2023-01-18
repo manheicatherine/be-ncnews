@@ -3,7 +3,6 @@ const {
   fetchArticlesById,
   fetchCommentsByArticleId,
   addComment,
-  
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -38,11 +37,16 @@ exports.getCommentsByArticleId = (req, res, next) => {
     });
 };
 
-exports.postCommentByArticleId = (req, res) => {
+exports.postCommentByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
- 
-  addComment(article_id, username, body).then((comment) => {
-    res.status(201).send({ comment });
-  });
+
+  addComment(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch((error) => {
+      console.log(error);
+      next(error);
+    });
 };

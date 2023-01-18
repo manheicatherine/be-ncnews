@@ -146,38 +146,64 @@ describe("API Testing", () => {
   });
 
   describe("Ticket 7: POST /api/articles/:article_id/comments", () => {
-      test("return the status of 201", () => {
-        const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
-        return request(app)
-        .post('/api/articles/5/comments')
+
+    test("return the status of 201", () => {
+      const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
+      return request(app)
+        .post("/api/articles/5/comments")
         .send(reqBody)
         .expect(201);
     });
+
     test("update an array of article 5 when passing new object", () => {
       const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
       return request(app)
-      .post('/api/articles/5/comments')
-      .send(reqBody)
-      .expect(201)
-      .then(({body})=>{
-        console.log(body);
-        expect(body.comment.length).toBe(1);
-        body.comment.forEach((comment) => {
-          expect(comment).toEqual(
-            expect.objectContaining({
-              comment_id: expect.any(Number),
-              body: expect.any(String),
-              article_id: expect.any(Number),
-              author: expect.any(String),
-              votes: expect.any(Number),
-              created_at: expect.any(String)
-            })
-          );
+        .post("/api/articles/5/comments")
+        .send(reqBody)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment.length).toBe(1);
+          body.comment.forEach((comment) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
+          });
         });
     });
+
+    test("Error handling 1: passing a invalid username but existing id", () => {
+      return request(app)
+        .post("/api/articles/5/comments")
+        .send({ username: "Blackpink", body: "Blackpick in your area~" })
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error handling 2: passing a existing but invalid id and correct username", () => {
+      return request(app)
+        .post("/api/articles/1234567/comments")
+        .send({ username: "butter_bridge", body: "BELLOOOOOOO" })
+        .then((res) => {
+          expect(res.status).toBe(400);
+          expect(res.body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error handling 3: passing a non existing id and correct username", () => {
+      return request(app)
+      .post("/api/articles/kpop/comments")
+      .send({ username: "butter_bridge", body: "BELLOOOOOOO" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+    });
   });
-  });
-
-
-
 });
