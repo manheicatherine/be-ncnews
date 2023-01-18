@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const { app } = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
+require('jest-sorted');
 
 beforeEach(() => seed(testData));
 afterAll(() => {
@@ -36,6 +37,10 @@ describe("API Testing", () => {
         .then(({ body }) => {
           const objOfArr = body.articles;
           expect(objOfArr.length).toBe(12);
+          expect(objOfArr[0].created_at).toBe("2020-11-03T09:12:00.000Z");
+          expect(objOfArr[objOfArr.length - 1].created_at).toBe(
+            "2020-01-07T14:08:00.000Z"
+          );
         });
     });
   });
@@ -48,17 +53,19 @@ describe("API Testing", () => {
         .then(({ body }) => {
           const article = body.article;
           expect(article.length).toBe(1);
-          expect(article).toEqual([{
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 100,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-          }]);
+          expect(article).toEqual([
+            {
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 100,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            },
+          ]);
         });
     });
   });
@@ -78,5 +85,64 @@ describe("API Testing", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request");
       });
+  });
+
+  describe("Ticket 6: GET /api/articles/:article_id/comments", () => {
+    test("returns an array of article 1 the most recent comments in descending order", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(comments.length).toBe(11);
+
+          body.comments.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
+          });
+
+
+          expect(comments[0].created_at).toBe("2020-11-03T21:00:00.000Z");
+          expect(comments[comments.length - 1].created_at).toBe(
+            "2020-01-01T03:08:00.000Z"
+          );
+        });
+    });
+
+    test("returns empty array when a valid number is passing with no comments", () => {
+        return request(app)
+          .get("/api/articles/2/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({});
+          });
+      });
+
+    test.only("Error handling 1: passing a valid but not existing id", () => {
+      return request(app)
+        .get("/api/articles/1001/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
+        });
+    });
+  
+    test("Error handling 2: passing a invalid id", () => {
+      return request(app)
+        .get("/api/articles/whereismyholiday/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
   });
 });
