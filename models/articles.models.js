@@ -53,7 +53,6 @@ exports.addComment = (id, username, body) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-      } else if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "404 Not Found" });
       } else {
         return rows;
