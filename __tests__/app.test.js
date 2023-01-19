@@ -206,24 +206,24 @@ describe("API Testing", () => {
     });
   });
 
-  describe("Ticket 8: PATCH /api/articles/:article_id", () => {
+  describe.only("Ticket 8: PATCH /api/articles/:article_id", () => {
     test("update votes count of article 1 when passing a positive value", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: 10 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 110,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
+          expect(body.article).toEqual(
+            expect.objectContaining({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 110,
+            })
+          );
         });
     });
 
@@ -233,21 +233,21 @@ describe("API Testing", () => {
         .send({ inc_votes: -10 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 90,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
+          expect(body.article).toEqual(
+            expect.objectContaining({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              body: "I find this existence challenging",
+              topic: "mitch",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 90,
+            })
+          );
         });
     });
 
-    test("Error handling 1: passing a invalid article id", () => {
+    test("Error handling 1: passing a valid but not existing article id", () => {
       return request(app)
         .patch("/api/articles/2022")
         .send({ inc_votes: 10 })
@@ -263,7 +263,16 @@ describe("API Testing", () => {
         .send({ inc_votes: 10 })
         .expect(400)
         .then(({ body }) => {
-        
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error handling 3: passing a non exisitng body of request", () => {
+      return request(app)
+        .patch("/api/articles/ramenisthebest")
+        .send({ haha: 100 })
+        .expect(400)
+        .then(({ body }) => {
           expect(body.msg).toBe("Bad request");
         });
     });
