@@ -285,6 +285,7 @@ describe("API Testing", () => {
         .expect(200)
         .then(({ body }) => {
           body.users.forEach((user) => {
+            expect(body.users.length).toBe(4)
             expect(user).toEqual(
               expect.objectContaining({
                 username: expect.any(String),

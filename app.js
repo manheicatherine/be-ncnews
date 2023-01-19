@@ -10,7 +10,7 @@ const {
   patchArticleByArticleId
   
 } = require("./controllers/articles.controllers");
-const {getUsers} =require('./controllers/user.controllers')
+const {getUsers} =require('./controllers/users.controllers')
 
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
