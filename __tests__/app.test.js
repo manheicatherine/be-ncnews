@@ -206,7 +206,7 @@ describe("API Testing", () => {
     });
   });
 
-  describe.only("Ticket 8: PATCH /api/articles/:article_id", () => {
+  describe("Ticket 8: PATCH /api/articles/:article_id", () => {
     test("update votes count of article 1 when passing a positive value", () => {
       return request(app)
         .patch("/api/articles/1")
@@ -277,4 +277,25 @@ describe("API Testing", () => {
         });
     });
   });
+
+  describe("Ticket 9: GET /api/users", () => {
+    test("returns an array of users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          body.users.forEach((user) => {
+            expect(body.users.length).toBe(4)
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String)
+              })
+            );
+          });
+        });
+    });
+  });
+
 });

@@ -3,7 +3,7 @@ const {
   fetchArticlesById,
   fetchCommentsByArticleId,
   addComment,
-  updateArticleByArticleId,
+  updateArticleByArticleId
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -64,3 +64,5 @@ exports.patchArticleByArticleId = (req, res, next) => {
       next(err);
     });
 };
+
+
