@@ -146,7 +146,6 @@ describe("API Testing", () => {
   });
 
   describe("Ticket 7: POST /api/articles/:article_id/comments", () => {
-
     test("return the status of 201", () => {
       const reqBody = { username: "butter_bridge", body: "BELLOOOOOOO" };
       return request(app)
@@ -199,11 +198,74 @@ describe("API Testing", () => {
 
     test("Error handling 3: passing a non existing id and correct username", () => {
       return request(app)
-      .post("/api/articles/kpop/comments")
-      .send({ username: "butter_bridge", body: "BELLOOOOOOO" })
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad request");
-      });
+        .post("/api/articles/kpop/comments")
+        .send({ username: "butter_bridge", body: "BELLOOOOOOO" })
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
+
+  describe("Ticket 8: PATCH /api/articles/:article_id", () => {
+    test("update votes count of article 1 when passing a positive value", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 110,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+
+    test("update votes count of article 1 when passing a negative value", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 90,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+
+    test("Error handling 1: passing a invalid article id", () => {
+      return request(app)
+        .patch("/api/articles/2022")
+        .send({ inc_votes: 10 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
+        });
+    });
+
+    test.only("Error handling 2: passing a non-exisitng article id", () => {
+      return request(app)
+        .patch("/api/articles/ramenisthebest")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then(({ body }) => {
+        
+          expect(body.msg).toBe("Bad request");
+        });
     });
   });
 });
