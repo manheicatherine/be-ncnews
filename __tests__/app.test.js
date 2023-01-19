@@ -257,7 +257,7 @@ describe("API Testing", () => {
         });
     });
 
-    test.only("Error handling 2: passing a non-exisitng article id", () => {
+    test("Error handling 2: passing a non-exisitng article id", () => {
       return request(app)
         .patch("/api/articles/ramenisthebest")
         .send({ inc_votes: 10 })
