@@ -1,12 +1,20 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 const { getTopics } = require("./controllers/topics.controllers");
-const { getArticles, getArticlesById, getCommentsByArticleId } = require("./controllers/articles.controllers");
+const {
+  getArticles,
+  getArticlesById,
+  getCommentsByArticleId,
+  postCommentByArticleId
+  
+} = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticlesById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 
 app.use((err, request, response, next) => {
@@ -18,16 +26,15 @@ app.use((err, request, response, next) => {
 });
 
 app.use((err, request, response, next) => {
-    if (err.code) {
-        response.status (400).send({ msg: 'Bad request' });
-        } else {
-            next (err);
-        }
-    })
+  if (err.code) {
+    response.status(400).send({ msg: "Bad request" });
+  } else {
+    next(err);
+  }
+});
 
-
-    app.use((err, request, response, next) => {
-        console. log (err);
-        response. status (500) .send({ msg: 'Internal Server Error' });
-        });
-    module.exports = { app };
+app.use((err, request, response, next) => {
+  console.log(err);
+  response.status(500).send({ msg: "Internal Server Error" });
+});
+module.exports = { app };

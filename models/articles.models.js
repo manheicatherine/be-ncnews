@@ -32,12 +32,27 @@ exports.fetchArticlesById = (id) => {
 exports.fetchCommentsByArticleId = (id) => {
   return db
     .query(
-      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, [id]
+      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
+      [id]
     )
     .then(({ rows }) => {
-        if (rows.length === 0){
+      if (rows.length === 0) {
+      } else if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "404 Not Found" });
+      } else {
+        return rows;
+      }
+    });
+};
 
-        }else if (rows.length === 0) {
+exports.addComment = (id, username, body) => {
+  return db
+    .query(
+      "INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;",
+      [id, username, body]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "404 Not Found" });
       } else {
         return rows;

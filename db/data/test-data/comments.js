@@ -126,4 +126,3 @@ module.exports = [
     created_at: 1595294400000,
   },
 ];
-
