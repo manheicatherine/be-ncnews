@@ -30,60 +30,73 @@ describe("API Testing", () => {
   });
 
   describe("Ticket 4: GET /api/articles", () => {
-    test("returns an array of articles when passing valid topic", () => {
+    test("returns an array of articles when passing query of valid sorted_by", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?sort_by=title")
         .expect(200)
-        .send({ sort_by: "author", order: "ASC", topic: "mitch" })
+        .then(({ body }) => {
+          expect(body.articles.length).toBe(12);
+          expect(body.articles).toBeSorted({ descending: true });
+        });
+    });
+
+    test("returns an array of articles when passing query of valid order", () => {
+      return request(app)
+        .get("/api/articles?order=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBe(12);
+          expect(body.articles).toBeSorted({ descending: false });
+        });
+    });
+
+    test("returns an array of articles when passing query of valid topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
         .then(({ body }) => {
           expect(body.articles).toBeSorted({ descending: false });
           expect(body.articles.length).toBe(11);
         });
     });
 
-    test("returns an array of articles which set the default of sorted by date in descending order", () => {
+    test("returns an array of articles when passing non-existing topic", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?howareyou=imfine")
         .expect(200)
         .then(({ body }) => {
-          const objOfArr = body.articles;
-          expect(objOfArr.length).toBe(12);
-          expect(objOfArr[0].created_at).toBe("2020-11-03T09:12:00.000Z");
-          expect(objOfArr[objOfArr.length - 1].created_at).toBe(
-            "2020-01-07T14:08:00.000Z"
-          );
+          expect(body.articles.length).toBe(12);
+          expect(body.articles).toBeSorted({ descending: true });
         });
     });
 
-    test("Error Handling 1: returns an empty array of articles when passing invalid sort_by to replace the default value", () => {
+    test("Error Handling 1: returns 400 bad request when passing invalid sort_by", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?sort_by=haha")
         .expect(400)
-        .send({ sort_by: "brandy", order: "ASC", topic: "mitch" })
         .then(({ body }) => {
           expect(body.msg).toBe("Bad request");
         });
     });
 
-    test("Error Handling 2: returns an empty array of articles when passing invalid order to replace the default value", () => {
+    test("Error Handling 2: returns 400 bad request of articles when passing invalid order", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?order=lol")
         .expect(400)
-        .send({ sort_by: "brandy", order: "ALOHA", topic: "mitch" })
         .then(({ body }) => {
           expect(body.msg).toBe("Bad request");
         });
     });
 
-    test("Error Handling 3: returns an empty array of articles when passing invalid topic", () => {
+    test("Error Handling 3: returns 404 not found of articles when passing invalid topic", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?topic=oic")
         .expect(404)
-        .send({ sort_by: "author", order: "ASC", topic: "friday finally!!!" })
         .then(({ body }) => {
           expect(body.msg).toBe("404 Not Found");
         });
     });
+
   });
 
   describe("Ticket 5: GET /api/articles/:article_id", () => {
