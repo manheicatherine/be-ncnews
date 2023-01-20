@@ -30,7 +30,18 @@ describe("API Testing", () => {
   });
 
   describe("Ticket 4: GET /api/articles", () => {
-    test("returns an array of articles which is sorted by date in descending order ", () => {
+    test("returns an array of articles when passing valid topic", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .send({ sort_by: "author", order: "ASC", topic: "mitch" })
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({ descending: false });
+          expect(body.articles.length).toBe(11);
+        });
+    });
+
+    test("returns an array of articles which set the default of sorted by date in descending order", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -41,6 +52,36 @@ describe("API Testing", () => {
           expect(objOfArr[objOfArr.length - 1].created_at).toBe(
             "2020-01-07T14:08:00.000Z"
           );
+        });
+    });
+
+    test("Error Handling 1: returns an empty array of articles when passing invalid sort_by to replace the default value", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(400)
+        .send({ sort_by: "brandy", order: "ASC", topic: "mitch" })
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error Handling 2: returns an empty array of articles when passing invalid order to replace the default value", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(400)
+        .send({ sort_by: "brandy", order: "ALOHA", topic: "mitch" })
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error Handling 3: returns an empty array of articles when passing invalid topic", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(404)
+        .send({ sort_by: "author", order: "ASC", topic: "friday finally!!!" })
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
         });
     });
   });
@@ -285,17 +326,16 @@ describe("API Testing", () => {
         .expect(200)
         .then(({ body }) => {
           body.users.forEach((user) => {
-            expect(body.users.length).toBe(4)
+            expect(body.users.length).toBe(4);
             expect(user).toEqual(
               expect.objectContaining({
                 username: expect.any(String),
                 name: expect.any(String),
-                avatar_url: expect.any(String)
+                avatar_url: expect.any(String),
               })
             );
           });
         });
     });
   });
-
 });

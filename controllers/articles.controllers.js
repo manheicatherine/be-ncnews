@@ -3,13 +3,20 @@ const {
   fetchArticlesById,
   fetchCommentsByArticleId,
   addComment,
-  updateArticleByArticleId
+  updateArticleByArticleId,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const { topic } = req.body;
+  const { order } = req.body;
+  const { sort_by } = req.body;
+  fetchArticles(sort_by, order, topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticlesById = (req, res, next) => {
@@ -54,15 +61,12 @@ exports.postCommentByArticleId = (req, res, next) => {
 exports.patchArticleByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  
+
   updateArticleByArticleId(article_id, inc_votes)
     .then((article) => {
-    
       res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
     });
 };
-
-
