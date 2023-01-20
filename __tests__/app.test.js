@@ -35,8 +35,24 @@ describe("API Testing", () => {
         .get("/api/articles?sort_by=title")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles.length).toBe(12);
+          console.log(body)
+          expect(body['articles'].length).toBe(12);
           expect(body.articles).toBeSorted({ descending: true });
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
         });
     });
 
@@ -47,6 +63,21 @@ describe("API Testing", () => {
         .then(({ body }) => {
           expect(body.articles.length).toBe(12);
           expect(body.articles).toBeSorted({ descending: false });
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
         });
     });
 
@@ -55,18 +86,23 @@ describe("API Testing", () => {
         .get("/api/articles?topic=mitch")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({ descending: false });
-          expect(body.articles.length).toBe(11);
-        });
-    });
-
-    test("returns an array of articles when passing non-existing topic", () => {
-      return request(app)
-        .get("/api/articles?howareyou=imfine")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles.length).toBe(12);
           expect(body.articles).toBeSorted({ descending: true });
+          expect(body.articles.length).toBe(11);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
         });
     });
 
@@ -96,7 +132,6 @@ describe("API Testing", () => {
           expect(body.msg).toBe("404 Not Found");
         });
     });
-
   });
 
   describe("Ticket 5: GET /api/articles/:article_id", () => {

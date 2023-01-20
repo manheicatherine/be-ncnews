@@ -5,47 +5,92 @@ exports.fetchArticles = (
   order = "DESC",
   topic = undefined
 ) => {
-  if (topic !== undefined && order !== undefined && sort_by !== undefined) {
-    return db
-      .query(
-        `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-   FROM articles LEFT JOIN comments
-   ON articles.article_id = comments.article_id
-   WHERE topic = $1
-   GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`,
-        [topic]
-      )
-      .then(({ rows }) => {
-        if (rows.length === 0) {
-          return Promise.reject({ status: 404, msg: "404 Not Found" });
-        } else {
-          const deleteUnuseItem = rows.map((each) => {
-            delete each.body;
-            return each;
-          });
-          return deleteUnuseItem;
-        }
-      });
-  } else if (topic === undefined) {
-    return db
-      .query(
-        `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-      FROM articles LEFT JOIN comments
-      ON articles.article_id = comments.article_id
-      GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
-      )
-      .then(({ rows }) => {
-        if (rows.length === 0) {
-          return Promise.reject({ status: 404, msg: "404 Not Found" });
-        } else {
-          const deleteUnuseItem = rows.map((each) => {
-            delete each.body;
-            return each;
-          });
-          return deleteUnuseItem;
-        }
-      });
+  const column = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "comment_count",
+    "created_at",
+    "votes",
+  ];
+  if (!column.includes(sort_by))
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
+    });
+    
+    const allowedOrderBy = ["ASC", "asc", "DESC", "desc"];
+    if (!allowedOrderBy.includes(order))
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
+    });
+    
+    const queryValues = [];
+    let query =
+      "SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
+  
+      if (topic) {
+    query += ` WHERE topic = $1 `;
+    queryValues.push(topic);
   }
+
+  query += `
+  GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order}`;
+
+  return db.query(query, queryValues).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "404 Not Found" });
+    } else {
+      return rows;
+    }
+  });
+
+  // if (topic !== undefined && order !== undefined && sort_by !== undefined) {
+  //   return db
+  //     .query(
+  //       `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+  //  FROM articles LEFT JOIN comments
+  //  ON articles.article_id = comments.article_id
+  //  WHERE topic = $1
+  //  GROUP BY articles.article_id ORDER BY $2 $3;`,
+  //       [topic, sort_by, order]
+  //     )
+  //     .then(({ rows }) => {
+  //       if (rows.length === 0) {
+  //         return Promise.reject({ status: 404, msg: "404 Not Found" });
+  //       } else {
+  //         const deleteUnuseItem = rows.map((each) => {
+  //           delete each.body;
+  //           return each;
+  //         });
+  //         return deleteUnuseItem;
+  //       }
+  //     });
+  // } else if (topic === undefined) {
+  //   return db
+  //     .query(
+  //       `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+  //     FROM articles LEFT JOIN comments
+  //     ON articles.article_id = comments.article_id
+  //     GROUP BY articles.article_id ORDER BY $2 $3;`,
+  //       [sort_by, order]
+  //     )
+  //     .then(({ rows }) => {
+  //       if (rows.length === 0) {
+  //         return Promise.reject({ status: 404, msg: "404 Not Found" });
+  //       } else {
+  //         const deleteUnuseItem = rows.map((each) => {
+  //           delete each.body;
+  //           return each;
+  //         });
+  //         return deleteUnuseItem;
+  //       }
+  //     });
+  // }
 };
 
 exports.fetchArticlesById = (id) => {
