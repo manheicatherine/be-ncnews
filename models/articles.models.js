@@ -49,48 +49,6 @@ exports.fetchArticles = (
     }
   });
 
-  // if (topic !== undefined && order !== undefined && sort_by !== undefined) {
-  //   return db
-  //     .query(
-  //       `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-  //  FROM articles LEFT JOIN comments
-  //  ON articles.article_id = comments.article_id
-  //  WHERE topic = $1
-  //  GROUP BY articles.article_id ORDER BY $2 $3;`,
-  //       [topic, sort_by, order]
-  //     )
-  //     .then(({ rows }) => {
-  //       if (rows.length === 0) {
-  //         return Promise.reject({ status: 404, msg: "404 Not Found" });
-  //       } else {
-  //         const deleteUnuseItem = rows.map((each) => {
-  //           delete each.body;
-  //           return each;
-  //         });
-  //         return deleteUnuseItem;
-  //       }
-  //     });
-  // } else if (topic === undefined) {
-  //   return db
-  //     .query(
-  //       `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-  //     FROM articles LEFT JOIN comments
-  //     ON articles.article_id = comments.article_id
-  //     GROUP BY articles.article_id ORDER BY $2 $3;`,
-  //       [sort_by, order]
-  //     )
-  //     .then(({ rows }) => {
-  //       if (rows.length === 0) {
-  //         return Promise.reject({ status: 404, msg: "404 Not Found" });
-  //       } else {
-  //         const deleteUnuseItem = rows.map((each) => {
-  //           delete each.body;
-  //           return each;
-  //         });
-  //         return deleteUnuseItem;
-  //       }
-  //     });
-  // }
 };
 
 exports.fetchArticlesById = (id) => {

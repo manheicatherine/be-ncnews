@@ -35,7 +35,6 @@ describe("API Testing", () => {
         .get("/api/articles?sort_by=title")
         .expect(200)
         .then(({ body }) => {
-          console.log(body)
           expect(body['articles'].length).toBe(12);
           expect(body.articles).toBeSorted({ descending: true });
           body.articles.forEach((article) => {
