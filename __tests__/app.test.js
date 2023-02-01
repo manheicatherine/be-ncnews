@@ -30,17 +30,105 @@ describe("API Testing", () => {
   });
 
   describe("Ticket 4: GET /api/articles", () => {
-    test("returns an array of articles which is sorted by date in descending order ", () => {
+    test("returns an array of articles when passing query of valid sorted_by", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?sort_by=title")
         .expect(200)
         .then(({ body }) => {
-          const objOfArr = body.articles;
-          expect(objOfArr.length).toBe(12);
-          expect(objOfArr[0].created_at).toBe("2020-11-03T09:12:00.000Z");
-          expect(objOfArr[objOfArr.length - 1].created_at).toBe(
-            "2020-01-07T14:08:00.000Z"
-          );
+          expect(body['articles'].length).toBe(12);
+          expect(body.articles).toBeSorted({ descending: true });
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+
+    test("returns an array of articles when passing query of valid order", () => {
+      return request(app)
+        .get("/api/articles?order=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBe(12);
+          expect(body.articles).toBeSorted({ descending: false });
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+
+    test("returns an array of articles when passing query of valid topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({ descending: true });
+          expect(body.articles.length).toBe(11);
+          body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+
+    test("Error Handling 1: returns 400 bad request when passing invalid sort_by", () => {
+      return request(app)
+        .get("/api/articles?sort_by=haha")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error Handling 2: returns 400 bad request of articles when passing invalid order", () => {
+      return request(app)
+        .get("/api/articles?order=lol")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+
+    test("Error Handling 3: returns 404 not found of articles when passing invalid topic", () => {
+      return request(app)
+        .get("/api/articles?topic=oic")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("404 Not Found");
         });
     });
   });
@@ -285,17 +373,16 @@ describe("API Testing", () => {
         .expect(200)
         .then(({ body }) => {
           body.users.forEach((user) => {
-            expect(body.users.length).toBe(4)
+            expect(body.users.length).toBe(4);
             expect(user).toEqual(
               expect.objectContaining({
                 username: expect.any(String),
                 name: expect.any(String),
-                avatar_url: expect.any(String)
+                avatar_url: expect.any(String),
               })
             );
           });
         });
     });
   });
-
 });

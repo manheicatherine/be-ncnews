@@ -1,20 +1,54 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-      FROM articles LEFT JOIN comments
-      ON articles.article_id = comments.article_id
-      GROUP BY articles.article_id ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      const deleteUnuseItem = rows.map((each) => {
-        delete each.body;
-        return each;
-      });
-      return deleteUnuseItem;
+exports.fetchArticles = (
+  sort_by = "created_at",
+  order = "DESC",
+  topic = undefined
+) => {
+  const column = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "comment_count",
+    "created_at",
+    "votes",
+  ];
+  if (!column.includes(sort_by))
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
     });
+    
+    const allowedOrderBy = ["ASC", "asc", "DESC", "desc"];
+    if (!allowedOrderBy.includes(order))
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
+    });
+    
+    const queryValues = [];
+    let query =
+      "SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
+  
+      if (topic) {
+    query += ` WHERE topic = $1 `;
+    queryValues.push(topic);
+  }
+
+  query += `
+  GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order}`;
+
+  return db.query(query, queryValues).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "404 Not Found" });
+    } else {
+      return rows;
+    }
+  });
+
 };
 
 exports.fetchArticlesById = (id) => {
