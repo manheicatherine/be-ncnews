@@ -392,7 +392,6 @@ describe("API Testing", () => {
         .delete("/api/comments/1")
         .expect(200)
         .then(({ body }) => {
-          console.log(body)
           // body.users.forEach((user) => {
           //   expect(body.users.length).toBe(4);
           //   expect(user).toEqual(
