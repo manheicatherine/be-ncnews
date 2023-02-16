@@ -392,16 +392,16 @@ describe("API Testing", () => {
         .delete("/api/comments/1")
         .expect(200)
         .then(({ body }) => {
-          // body.users.forEach((user) => {
-          //   expect(body.users.length).toBe(4);
-          //   expect(user).toEqual(
-          //     expect.objectContaining({
-          //       username: expect.any(String),
-          //       name: expect.any(String),
-          //       avatar_url: expect.any(String),
-          //     })
-          //   );
-          // });
+          expect(body.comment).toEqual(
+            expect.objectContaining({
+              comment_id: 1,
+              body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              article_id: 9,
+              author: 'butter_bridge',
+              votes: 16,
+              created_at: '2020-04-06T12:17:00.000Z'
+            })
+          );
         });
     });
   });
