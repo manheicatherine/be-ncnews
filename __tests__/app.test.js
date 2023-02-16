@@ -35,7 +35,7 @@ describe("API Testing", () => {
         .get("/api/articles?sort_by=title")
         .expect(200)
         .then(({ body }) => {
-          expect(body['articles'].length).toBe(12);
+          expect(body["articles"].length).toBe(12);
           expect(body.articles).toBeSorted({ descending: true });
           body.articles.forEach((article) => {
             expect(article).toEqual(
@@ -382,6 +382,27 @@ describe("API Testing", () => {
               })
             );
           });
+        });
+    });
+  });
+
+  describe("Ticket 10: Delete /api/comments/:comment_id", () => {
+    test("returns an array of users", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body)
+          // body.users.forEach((user) => {
+          //   expect(body.users.length).toBe(4);
+          //   expect(user).toEqual(
+          //     expect.objectContaining({
+          //       username: expect.any(String),
+          //       name: expect.any(String),
+          //       avatar_url: expect.any(String),
+          //     })
+          //   );
+          // });
         });
     });
   });

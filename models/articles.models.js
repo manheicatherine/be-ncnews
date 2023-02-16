@@ -20,19 +20,19 @@ exports.fetchArticles = (
       status: 400,
       msg: "Bad request",
     });
-    
-    const allowedOrderBy = ["ASC", "asc", "DESC", "desc"];
-    if (!allowedOrderBy.includes(order))
+
+  const allowedOrderBy = ["ASC", "asc", "DESC", "desc"];
+  if (!allowedOrderBy.includes(order))
     return Promise.reject({
       status: 400,
       msg: "Bad request",
     });
-    
-    const queryValues = [];
-    let query =
-      "SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
-  
-      if (topic) {
+
+  const queryValues = [];
+  let query =
+    "SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
+
+  if (topic) {
     query += ` WHERE topic = $1 `;
     queryValues.push(topic);
   }
@@ -48,7 +48,6 @@ exports.fetchArticles = (
       return rows;
     }
   });
-
 };
 
 exports.fetchArticlesById = (id) => {
@@ -101,6 +100,22 @@ exports.updateArticleByArticleId = (id, inc_votes) => {
       [inc_votes, id]
     )
     .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "404 Not Found" });
+      } else {
+        return rows[0];
+      }
+    });
+};
+
+exports.deleteComment = ( comment_id) => {
+  return db
+    .query(
+      `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`,
+      [comment_id]
+    )
+    .then(({ rows }) => {
+  
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "404 Not Found" });
       } else {
