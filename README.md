@@ -1,4 +1,4 @@
-#NC News App
+# NC News App
 
 ## Introduction
 This is a back-end project that provides several endpoints for fetching news articles. The API supports various functionalities including getting all articles, getting an article by its ID, getting articles by topic, sorting articles by date, votes or comments count in ascending or descending order, voting for articles, adding comments to articles, and deleting comments.
