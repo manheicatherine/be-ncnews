@@ -16,6 +16,7 @@ PostgreSQL<br />
 Supertest<br />
 Dotenv<br />
 Nodemon<br />
+Axios
 
 ## Created By
 [Catherine Li](https://github.com/manheicatherine)
